@@ -59,8 +59,7 @@ FastlaneCore::ConfigItem.new(key: :api_token,
 FastlaneCore::ConfigItem.new(key: :dsym_path,
                              type: Array,
                              description: 'Array of paths to *.dSYM.zip files',
-                             default_value: Actions.lane_context[SharedValues::
-                             ]),
+                             default_value: Actions.lane_context[SharedValues::DSYM_PATHS]),
 ]
 end
 
