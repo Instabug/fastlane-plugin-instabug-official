@@ -5,31 +5,36 @@ module Fastlane
     module Actions
         class InstabugOfficialAction < Action
             def self.run(params)
-            api_token = params[:api_token]
-            
-            endpoint = "https://api.instabug.com/api/sdk/v3/symbols_files"
-            command = "curl #{endpoint} --write-out %{http_code} --silent --output /dev/null -F os=\"ios\" -F application_token=\"#{api_token}\" -F symbols_file="
-            dsym_paths = params[:dsym_path].uniq
-            
-            curlCommand = ""
-            
-            dsym_paths.each do |file_path|
-                curlCommand += build_single_file_command(command, file_path)
-                if file_path != dsym_paths.last
-                    curlCommand += " | "
+                api_token = params[:api_token]
+
+                endpoint = "https://api.instabug.com/api/sdk/v3/symbols_files"
+                command = "curl #{endpoint} --write-out %{http_code} --silent --output /dev/null -F os=\"ios\" -F application_token=\"#{api_token}\" -F symbols_file="
+
+                curlCommand = ""
+                single_path = params[:dsym_path]
+
+                 if single_path != nil
+                    curlCommand += build_single_file_command(command, single_path)
+                 else
+                    dsym_paths = params[:dsym_array_paths].uniq
+                    dsym_paths.each do |file_path|
+                        curlCommand += build_single_file_command(command, file_path)
+                        if file_path != dsym_paths.last
+                            curlCommand += " | "
+                        end
+                    end
+                 end
+
+                UI.verbose curlCommand
+                return curlCommand if Helper.test?
+
+                result = Actions.sh(curlCommand)
+                if result == "200"
+                    UI.success 'dSYM is successfully uploaded to Instabug 🤖'
+                else
+                    UI.error "Something went wrong during Instabug dSYM upload. Status code is #{result}"
                 end
             end
-    
-    UI.verbose curlCommand
-    return curlCommand if Helper.test?
-    
-    result = Actions.sh(curlCommand)
-    if result == "200"
-    UI.success 'dSYM is successfully uploaded to Instabug 🤖'
-    else
-    UI.error "Something went wrong during Instabug dSYM upload. Status code is #{result}"
-end
-end
 
 def self.description
 "upload dsyms to fastlane"
@@ -56,10 +61,20 @@ FastlaneCore::ConfigItem.new(key: :api_token,
                              verify_block: proc do |value|
                              UI.user_error!("No API token for InstabugAction given, pass using `api_token: 'token'`") unless value && !value.empty?
                              end),
-FastlaneCore::ConfigItem.new(key: :dsym_path,
+FastlaneCore::ConfigItem.new(key: :dsym_array_paths,
                              type: Array,
+                             optional: true,
                              description: 'Array of paths to *.dSYM.zip files',
                              default_value: Actions.lane_context[SharedValues::DSYM_PATHS]),
+FastlaneCore::ConfigItem.new(key: :dsym_path,
+                             env_name: 'FL_INSTABUG_DSYM_PATH',
+                             description: 'Path to *.dSYM file',
+                             default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
+                             is_string: true,
+                             optional: true,
+                             verify_block: proc do |value|
+                                 UI.user_error!("dSYM file doesn't exists") unless File.exist?(value)
+                             end)
 ]
 end
 
