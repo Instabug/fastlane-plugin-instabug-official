@@ -126,7 +126,7 @@ module Fastlane
         file_path = if dsym_path.end_with?('.zip')
                       dsym_path.shellescape
                     else
-                      ZipAction.run(path: dsym_path).shellescape
+                      ZipAction.run(path: dsym_path, include: [], exclude: []).shellescape
                     end
         command + "@\"#{Shellwords.shellescape(file_path)}\""
       end
