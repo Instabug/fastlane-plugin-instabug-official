@@ -124,11 +124,11 @@ module Fastlane
 
       def self.build_single_file_command(command, dsym_path)
         file_path = if dsym_path.end_with?('.zip')
-                      dsym_path.shellescape
+                      dsym_path
                     else
-                      ZipAction.run(path: dsym_path, include: [], exclude: []).shellescape
+                      ZipAction.run(path: dsym_path, include: [], exclude: [])
                     end
-        command + "@\"#{Shellwords.shellescape(file_path)}\""
+        command + "@\"#{file_path}\""
       end
     end
   end
