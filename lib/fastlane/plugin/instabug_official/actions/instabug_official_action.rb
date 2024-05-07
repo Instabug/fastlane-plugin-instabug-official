@@ -96,7 +96,15 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :dsym_array_paths,
                                        type: Array,
                                        optional: true,
-                                       description: 'Array of paths to *.dSYM files')
+                                       description: 'Array of paths to *.dSYM files'),
+          FastlaneCore::ConfigItem.new(key: :eu,
+                                    type: Boolean,
+                                    optional: true,
+                                    description: 'Should use the EU cluster or not'),
+          FastlaneCore::ConfigItem.new(key: :end_point,
+                                     type: String,
+                                     optional: true,
+                                     description: 'Custom end point to be used to upload the dsyms to')
         ]
       end
 
