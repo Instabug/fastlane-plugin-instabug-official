@@ -11,8 +11,14 @@ module Fastlane
 
         UI.verbose 'Running Instabug Action'
         api_token = params[:api_token]
+        eu = params[:eu] || false
+        
+        default_end_point = 'https://api.instabug.com/api/sdk/v3/symbols_files'
+        if eu
+            default_end_point = 'https://api-eu.instabug.com/api/sdk/v3/symbols_files'
+        end
 
-        endpoint = 'https://api.instabug.com/api/sdk/v3/symbols_files'
+        endpoint = params[:end_point] || default_end_point
         command = "curl #{endpoint} --write-out %{http_code} --silent --output /dev/null -F os=\"ios\" -F application_token=\"#{api_token}\" -F symbols_file="
 
         dsym_paths = []
@@ -71,7 +77,9 @@ module Fastlane
       def self.example_code
         [
           'instabug_official(api_token: "<Instabug token>")',
-          'instabug_official(api_token: "<Instabug token>", dsym_array_paths: ["./App1.dSYM.zip", "./App2.dSYM.zip"])'
+          'instabug_official(api_token: "<Instabug token>", dsym_array_paths: ["./App1.dSYM.zip", "./App2.dSYM.zip"])',
+          'instabug_official(api_token: "<Instabug token>", eu: true)',
+          'instabug_official(api_token: "<Instabug token>", end_point: "https://api.instabug.com/api/sdk/v3/symbols_files")'
         ]
       end
 
@@ -88,7 +96,15 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :dsym_array_paths,
                                        type: Array,
                                        optional: true,
-                                       description: 'Array of paths to *.dSYM files')
+                                       description: 'Array of paths to *.dSYM files'),
+          FastlaneCore::ConfigItem.new(key: :eu,
+                                    type: Boolean,
+                                    optional: true,
+                                    description: 'Should use the EU cluster or not'),
+          FastlaneCore::ConfigItem.new(key: :end_point,
+                                     type: String,
+                                     optional: true,
+                                     description: 'Custom end point to be used to upload the dsyms to')
         ]
       end
 

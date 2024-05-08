@@ -28,6 +28,16 @@ instabug_official(api_token: "<Instabug token>")
 instabug_official(api_token: "<Instabug token>", dsym_array_paths: ["./App1.dSYM.zip", "./App2.dSYM.zip"])
 ```
 
+If you are using the EU cluster in the SDK you need to use the `eu` parameter to upload to the EU cluster
+```
+instabug_official(api_token: "<Instabug token>", eu: true)
+```
+
+If you're using a custom endpint please provide it using the `end_point` parameter as follows
+```
+instabug_official(api_token: "<Instabug token>", end_point: "https://api.instabug.com/api/sdk/v3/symbols_files")
+```
+
 ## Issues and Feedback
 
 For any other issues and feedback about this plugin, please submit it to this repository.
