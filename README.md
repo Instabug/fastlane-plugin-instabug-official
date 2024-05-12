@@ -33,7 +33,7 @@ If you are using the EU cluster in the SDK you need to use the `eu` parameter to
 instabug_official(api_token: "<Instabug token>", eu: true)
 ```
 
-If you're using a custom endpint please provide it using the `end_point` parameter as follows
+If you're using a custom endpoint please provide it using the `end_point` parameter as follows
 ```
 instabug_official(api_token: "<Instabug token>", end_point: "https://api.instabug.com/api/sdk/v3/symbols_files")
 ```
